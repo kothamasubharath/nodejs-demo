@@ -1,34 +1,47 @@
-pipeline {
-    agent any 
-    environment {
-    DOCKERHUB_CREDENTIALS = credentials('valaxy-dockerhub')
+pipeline{
+    agent any
+    environment{
+        AWS_ACCOUNT_ID="838342381657"
+        AWS_DEFAULT_REGION="ap-south-1"
+        IMAGE_REPO_NAME="deploy-kube"
+        IMAGE_TAG="latest"
+        REPOSITORY_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
     }
-    stages { 
-        stage('SCM Checkout') {
+    stages{
+        stage('git fetch'){
             steps{
-            git 'https://github.com/ravdy/nodejs-demo.git'
+                git 'https://github.com/kothamasubharath/nodejs-demo.git'
             }
         }
-
-        stage('Build docker image') {
-            steps {  
-                sh 'docker build -t valaxy/nodeapp:$BUILD_NUMBER .'
-            }
-        }
-        stage('login to dockerhub') {
+        stage('build image'){
             steps{
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-            }
+                script{
+                    sh 'docker system prune -a'
+                    dockerImage = docker.build "${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                } 
+            }  
         }
-        stage('push image') {
+        stage('Logging to AWS ECR'){
             steps{
-                sh 'docker push valaxy/nodeapp:$BUILD_NUMBER'
+                script{
+                       sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 838342381657.dkr.ecr.us-east-1.amazonaws.com/${IMAGE_REPO_NAME}"
+                }
+            }     
+        }
+        stage('pushing to ECR'){
+            steps{
+                script{
+                    sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URL}:${IMAGE_TAG}"
+                    sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                }
             }
         }
-}
-post {
-        always {
-            sh 'docker logout'
+        stage('deploying app to kubernetes'){
+            steps{
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube', namespace: '', serverUrl: '') {
+                    sh 'kubectl apply -f deployment.yml'
+                }
+            }
         }
     }
 }
