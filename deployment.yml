@@ -6,14 +6,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: jenkins-prod
+      app: jenkins-app
   template:
     metadata:
       labels:
-        app: jenkins-prod
+        app: jenkins-app
     spec:
       containers:
-        - name: jenkins-prod
+        - name: jenkins-app
           image: 838342381657.dkr.ecr.ap-south-1.amazonaws.com/deploy-kube
           ports:
           - containerPort: 80
@@ -21,10 +21,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: jenkins-dev-svc
+  name: jenkins-app-svc
 spec:
   type: NodePort
   ports:
   - port: 80
     targetPort: 80
-    nodePort: 32123
+    nodePort: 32124
