@@ -3,7 +3,7 @@ pipeline{
     environment{
         AWS_ACCOUNT_ID="838342381657"
         AWS_DEFAULT_REGION="ap-south-1"
-        IMAGE_REPO_NAME="deploy-kube"
+        IMAGE_REPO_NAME="deploy-dev"
         IMAGE_TAG="latest"
         REPOSITORY_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
     }
