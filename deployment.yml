@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: jenkins-app
-          image: 838342381657.dkr.ecr.ap-south-1.amazonaws.com/deploy-kube
+          image: 838342381657.dkr.ecr.ap-south-1.amazonaws.com/deploy-dev
           ports:
           - containerPort: 80
 ---
