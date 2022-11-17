@@ -39,7 +39,7 @@ pipeline{
         stage('deploying app to kubernetes'){
             steps{
                 withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'kube', namespace: '', serverUrl: '') {
-                    sh 'kubectl apply -f deployment.yml'
+                    sh 'kubectl apply -f deployment1.yml'
                 }
             }
         }
