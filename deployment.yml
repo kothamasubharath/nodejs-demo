@@ -24,7 +24,9 @@ metadata:
   name: jenkins-master-svc
 spec:
   type: NodePort
+  selector:
+   app: jenkins-prod
   ports:
-  - port: 80
-    targetPort: 80
-    nodePort: 32121
+   - port: 80
+     targetPort: 80
+     nodePort: 32121
